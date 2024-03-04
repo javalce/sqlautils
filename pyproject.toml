@@ -7,8 +7,63 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+sqlalchemy = ">=2.0.0,<2.1.0"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.2"
+mypy = "^1.8.0"
+black = ">=22.10,<24.0"
+ruff = "^0.3.0"
+coverage = { extras = ["toml"], version = ">=6.2,<8.0" }
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+parallel = true
+source = ["tests", "sqlautils"]
+context = '${CONTEXT}'
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "@overload",
+    'if __name__ == "__main__":',
+    'if TYPE_CHECKING:',
+]
+
+[tool.black]
+line-length = 100
+
+[tool.mypy]
+strict = true
+
+[tool.ruff]
+src = ["sedipualba"]
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
+    "W191", # indentation contains tabs
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.ruff.lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true
