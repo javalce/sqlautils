@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "sqlautils"
+version = "0.1.0"
+description = "SQLAlchemy 2.0+ wrapper that simplifies its use in Python applications."
+authors = ["Javier Valero Cejudo <javalce29@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
