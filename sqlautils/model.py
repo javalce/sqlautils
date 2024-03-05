@@ -1,6 +1,7 @@
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
+from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -17,10 +18,17 @@ class Tablename:
 
 
 class ModelMixin:
-    __metadatas__: Dict[str, Any] = {}
+    __metadatas__: Dict[Union[str, None], Any] = {}
     __tablename__: Any = Tablename()
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
+        bind_key = getattr(cls, "__bind_key__", None)
+        if bind_key is not None:
+            if bind_key not in cls.__metadatas__:
+                cls.__metadatas__[bind_key] = MetaData()
+            cls.metadata = cls.__metadatas__[bind_key]  # type: ignore
+        elif None not in cls.__metadatas__ and getattr(cls, "metadata", None) is not None:
+            cls.__metadatas__[None] = cls.metadata  # type: ignore
         super().__init_subclass__(**kwargs)
 
 
