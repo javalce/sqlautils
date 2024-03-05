@@ -32,10 +32,10 @@ def db():
 @pytest.fixture(autouse=True)
 def init_db_tables(db, MockModel):
     with db.session_ctx():
-        BaseModel.metadata.create_all(db.engine)
+        BaseModel.metadata.create_all(db.get_engine())
     yield
     with db.session_ctx():
-        BaseModel.metadata.drop_all(db.engine)
+        BaseModel.metadata.drop_all(db.get_engine())
     BaseModel.metadata.clear()
     clear_mappers()
 
