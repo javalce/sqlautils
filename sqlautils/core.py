@@ -81,7 +81,7 @@ class SQLADatabase:
 
         Example:
         with db.session_ctx() as session:
-            session.query(...)
+            session.execute(...)
         """
         session = _session.get()
 
