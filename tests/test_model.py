@@ -1,8 +1,6 @@
-# FILEPATH: /home/javalce/Dev/sqlautils/tests/test_model.py
-
 import pytest
 from sqlalchemy import Integer
-from sqlalchemy.orm import Mapped, clear_mappers, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, clear_mappers, mapped_column
 from sqlautils.model import BaseModel
 
 
@@ -13,17 +11,19 @@ def teardown_function():
     clear_mappers()
 
 
-@pytest.fixture
-def DummyModel():
+def test_base_model_default_tablename():
     class DummyModel(BaseModel):
         id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    return DummyModel
+    assert issubclass(DummyModel, DeclarativeBase)
+    assert getattr(DummyModel, "__tablename__", None) == "dummy_model"
 
 
-def test_base_model_tablename(DummyModel):
-    assert DummyModel.__tablename__ == "dummymodel"
+def test_base_model_tablename_custom():
+    class DummyModel(BaseModel):
+        __tablename__ = "dummy_table"
 
+        id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-def test_base_model_name(DummyModel):
-    assert DummyModel.__name__ == "DummyModel"
+    assert issubclass(DummyModel, DeclarativeBase)
+    assert getattr(DummyModel, "__tablename__", None) == "dummy_table"

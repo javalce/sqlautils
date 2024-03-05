@@ -1,13 +1,34 @@
-from sqlalchemy.orm import DeclarativeBase, declared_attr
+import re
+from typing import Any, Dict
+
+from sqlalchemy.orm import DeclarativeBase
 
 
-class BaseModel(DeclarativeBase):
+def camel_to_snake_case(name: str) -> str:
+    name = re.sub(r"((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))", r"_\1", name)
+    return name.lower().lstrip("_")
+
+
+class Tablename:
+    def __get__(self, _: Any, cls: Any) -> Any:
+        if cls.__dict__.get("__tablename__") is None and cls.__dict__.get("__table__") is None:
+            cls.__tablename__ = camel_to_snake_case(cls.__name__)
+        return getattr(cls, "__tablename__", None)
+
+
+class ModelMixin:
+    __metadatas__: Dict[str, Any] = {}
+    __tablename__: Any = Tablename()
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+
+
+class BaseModel(ModelMixin, DeclarativeBase):
     """The base model class.
 
     This class is a subclass of the SQLAlchemy `DeclarativeBase` class and is
     intended to be used as the base class for all models in the application.
     """
 
-    @declared_attr  # type: ignore
-    def __tablename__(cls) -> str:
-        return cls.__name__.lower()
+    __abstract__ = True
