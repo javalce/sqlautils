@@ -1,11 +1,10 @@
 from contextlib import contextmanager
-from contextvars import ContextVar
 from typing import Any, Dict, Iterator, Union
 
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-_session: ContextVar[Union[Session, None]] = ContextVar("_session", default=None)
+from .session import _session, get_session
 
 
 class SQLADatabase:
@@ -70,12 +69,7 @@ class SQLADatabase:
     @property
     def session(self) -> Session:
         """Return a new session."""
-        session = _session.get()
-
-        if session is None:
-            raise RuntimeError("No session is available")
-
-        return session
+        return get_session()
 
     @contextmanager
     def session_ctx(self) -> Iterator[Session]:
